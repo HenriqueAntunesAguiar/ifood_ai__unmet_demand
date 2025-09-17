@@ -161,16 +161,31 @@ class CreateDb():
     def client_db(self):
 
         locations = ['Setor 1', 'Setor 2', 'Setor 3', 'Setor 4']
+        tickets = ['High Ticket', 'Mediu-high Ticket', 'Mediu Ticket', 'Low Ticket']
+
         self.products()
         
         for i in range(0, 1000):
             self.clients.append(
                 {
                     'searched_item':random.choice(self.products_list),
-                    'location':random.choice(locations)
+                    'ticket':random.choice(tickets)
                 }
             )
+
             client = self.clients[-1]
+            if client['ticket'] == 'High Ticket':
+                client['location'] = 'Setor 1'
+
+            elif client['ticket'] == 'Medium-high Ticket':
+                client['location'] = random.choice(['Setor 2', 'Setor 3'])
+
+            elif client['ticket'] == 'Medium Ticket':
+                client['location'] = random.choice(['Setor 3', 'Setor 4'])
+            
+            else:
+                client['location'] = 'Setor 4'
+                
             client['item_found'] = client['location'] in self.product_per_location[client['searched_item']]
 
 db = CreateDb()
