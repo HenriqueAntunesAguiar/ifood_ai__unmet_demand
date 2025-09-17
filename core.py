@@ -7,7 +7,7 @@ def Top5(clients_item_not_found):
 
     for i in range(0,5):
         top5.append(clients_item_not_found.searched_item.value_counts().head(5).index[i])
-
+        print(clients_item_not_found.searched_item.value_counts())
     return top5    
     
 def CheckAble(restaurants_of_location, top5_location, itens_to_search):
@@ -101,7 +101,7 @@ for product in products_to_search_recipe_v2:
         
     print(products_to_search_recipe_v2.index(product), len(products_to_search_recipe_v2))
 
-final_response = {}
+final_response = []
 
 for item in itens_to_search:
     
@@ -112,11 +112,15 @@ for item in itens_to_search:
     
     response = CheckIngredientsToRecipeAndRestaurant(
                     {
-                        'restaurant_ingredients':'',
+                        'restaurant_ingredients':restaurant_ingredients,
                         'recipe_ingredients':recipe_ingredients,
                         'recipe_name':new_product,
                     }
                 ).RunModel()
-    final_response.update({restaurant:response})
+    final_response.append({'restaurant':restaurant,
+                           'obs':response['obs'],})
     print(item)
+
+final_df = pd.DataFrame(final_response)
+final_df.to_csv('final_result.csv', index=False)
 # Se sim, verificar se produtos condizem com receita e se precisa de adaptação;

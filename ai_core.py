@@ -114,7 +114,7 @@ class CheckIngredientsToRecipeAndRestaurant():
         self.api_token = os.getenv('API_KEY__GEMINI')
 
     class CheckIngredientsToRecipeAndRestaurantParser(BaseModel):
-        obs: str = Field(..., description='Descreva neste campo observações sobre os ingredientes da receita, do restaurante, listando ingredientes possuidos, faltantes e possíveis modificações na receita para se adaptar os ingredientes da receita.')
+        obs: str = Field(..., description='Descreva neste campo observações sobre os ingredientes da receita, do restaurante, listando ingredientes presentes, faltantes ') # e possíveis modificações na receita para se adaptar os ingredientes da receita. --> não teve um bom resultado;
         
     def RunModel(self):
         llm = ChatGoogleGenerativeAI(api_key=self.api_token,
@@ -135,7 +135,7 @@ class CheckIngredientsToRecipeAndRestaurant():
 
                         ____________________________________________________________________________________________________
                         Com base nestes dados, deve julgar e retornar:                      
-                        * Observação sobre os ingredientes da receita, do restaurante, listando ingredientes possuidos, faltantes e possíveis modificações na receita para se adaptar os ingredientes da receita.
+                        * Observação sobre os ingredientes da receita, do restaurante, listando ingredientes presentes e faltantes.
 
                         ____________________________________________________________________________________________________
                         Seguem os dados para análise:
@@ -148,7 +148,7 @@ class CheckIngredientsToRecipeAndRestaurant():
                      partial_variables={'outputparser':parser.get_format_instructions()}
                           
         )
-    
+
         chain = prompt | llm | parser
         response = chain.invoke({'input_ingredients':self.ingredients})
 
