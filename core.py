@@ -6,8 +6,10 @@ def Top5(clients_item_not_found):
     top5=[]
 
     for i in range(0,5):
+
         top5.append(clients_item_not_found.searched_item.value_counts().head(5).index[i])
         print(clients_item_not_found.searched_item.value_counts())
+        
     return top5    
     
 def CheckAble(restaurants_of_location, top5_location, itens_to_search):
@@ -18,20 +20,12 @@ def CheckAble(restaurants_of_location, top5_location, itens_to_search):
         restaurant_type=restaurant_line[1]
         products=restaurant_line[2]
         product_to_add=top5_location
-
-        # print({
-        #     'restaurant_type':restaurant_type,
-        #     'products':products,
-        #     'product_to_add':product_to_add
-        # })
         
         ables = CheckRestaurantAbleToAddRecipe({
             'restaurant_type':restaurant_type,
             'products':products,
             'product_to_add':product_to_add
         }).RunModel()
-
-        # print(ables, restaurant_type, product_to_add)
 
         i=0
 
@@ -53,36 +47,41 @@ def CheckAble(restaurants_of_location, top5_location, itens_to_search):
 clients = pd.read_csv('clients.csv')
 restaurants = pd.read_csv('restaurants.csv')
 
-clients_of_location_1 = clients[clients['location'] == 'Setor 1']
-restaurants_of_location_1 = restaurants[restaurants['location'] == 'Setor 1']
+datas_per_location = {}
 
-clients_of_location_2 = clients[clients['location'] == 'Setor 2']
-restaurants_of_location_2 = restaurants[restaurants['location'] == 'Setor 2']
+datas_per_location['Setor 1'] = {'clients':clients[clients['location'] == 'Setor 1'],
+                                 'restaurants':restaurants[restaurants['location'] == 'Setor 1']}
 
-clients_of_location_3 = clients[clients['location'] == 'Setor 3']
-restaurants_of_location_3 = restaurants[restaurants['location'] == 'Setor 3']
+datas_per_location['Setor 2'] = {'clients':clients[clients['location'] == 'Setor 2'],
+                                 'restaurants':restaurants[restaurants['location'] == 'Setor 2']}
 
-clients_of_location_4 = clients[clients['location'] == 'Setor 4']
-restaurants_of_location_4 = restaurants[restaurants['location'] == 'Setor 4']
+datas_per_location['Setor 3'] = {'clients':clients[clients['location'] == 'Setor 3'],
+                                 'restaurants':restaurants[restaurants['location'] == 'Setor 3']}
 
-products_for_search_recive = []
+datas_per_location['Setor 4'] = {'clients':clients[clients['location'] == 'Setor 4'],
+                                 'restaurants':restaurants[restaurants['location'] == 'Setor 4']}
 
-clients_item_not_found__location_1 = clients_of_location_1[clients_of_location_1['item_found'] == False]
-clients_item_not_found__location_2 = clients_of_location_2[clients_of_location_2['item_found'] == False]
-clients_item_not_found__location_3 = clients_of_location_3[clients_of_location_3['item_found'] == False]
-clients_item_not_found__location_4 = clients_of_location_4[clients_of_location_4['item_found'] == False]
+datas_per_location['Setor 1'].update({'not_found':datas_per_location['Setor 1']['clients'][datas_per_location['Setor 1']['clients']['item_found'] == False]})
+datas_per_location['Setor 2'].update({'not_found':datas_per_location['Setor 2']['clients'][datas_per_location['Setor 2']['clients']['item_found'] == False]})
+datas_per_location['Setor 3'].update({'not_found':datas_per_location['Setor 3']['clients'][datas_per_location['Setor 3']['clients']['item_found'] == False]})
+datas_per_location['Setor 4'].update({'not_found':datas_per_location['Setor 4']['clients'][datas_per_location['Setor 4']['clients']['item_found'] == False]})
 
-top5_location1 = Top5(clients_item_not_found__location_1)
-top5_location2 = Top5(clients_item_not_found__location_2)
-top5_location3 = Top5(clients_item_not_found__location_3)
-top5_location4 = Top5(clients_item_not_found__location_4)
+top5_location1 = Top5(datas_per_location['Setor 1']['not_found'])
+top5_location2 = Top5(datas_per_location['Setor 2']['not_found'])
+top5_location3 = Top5(datas_per_location['Setor 3']['not_found'])
+top5_location4 = Top5(datas_per_location['Setor 4']['not_found'])
+
+datas_per_location['Setor 1'].update({'top_5':top5_location1})
+datas_per_location['Setor 2'].update({'top_5':top5_location2})
+datas_per_location['Setor 3'].update({'top_5':top5_location3})
+datas_per_location['Setor 4'].update({'top_5':top5_location4})
 
 itens_to_search = []
 
-itens_to_search = CheckAble(restaurants_of_location_1, top5_location1, itens_to_search)
-itens_to_search = CheckAble(restaurants_of_location_2, top5_location2, itens_to_search)
-itens_to_search = CheckAble(restaurants_of_location_3, top5_location3, itens_to_search)
-itens_to_search = CheckAble(restaurants_of_location_4, top5_location4, itens_to_search)
+itens_to_search = CheckAble(datas_per_location['Setor 1']['restaurants'], datas_per_location['Setor 1']['top_5'], itens_to_search)
+itens_to_search = CheckAble(datas_per_location['Setor 2']['restaurants'], datas_per_location['Setor 2']['top_5'], itens_to_search)
+itens_to_search = CheckAble(datas_per_location['Setor 3']['restaurants'], datas_per_location['Setor 3']['top_5'], itens_to_search)
+itens_to_search = CheckAble(datas_per_location['Setor 4']['restaurants'], datas_per_location['Setor 4']['top_5'], itens_to_search)
 
 products_to_search_recipe = []
 
@@ -117,10 +116,18 @@ for item in itens_to_search:
                         'recipe_name':new_product,
                     }
                 ).RunModel()
-    final_response.append({'restaurant':restaurant,
-                           'obs':response['obs'],})
-    print(item)
+    
+    location = list(restaurants[restaurants['name']==restaurant].location.values)[0]
+    potential_customers = datas_per_location[location]['not_found'].value_counts()[new_product].values[0]
 
+    final_response.append({'restaurant':restaurant,
+                           'location':location,
+                           'potential_customers':potential_customers,
+                           'obs':response['obs'],                           
+                           })
+    
+    
+    print(item)   
+    
 final_df = pd.DataFrame(final_response)
 final_df.to_csv('final_result.csv', index=False)
-# Se sim, verificar se produtos condizem com receita e se precisa de adaptação;
