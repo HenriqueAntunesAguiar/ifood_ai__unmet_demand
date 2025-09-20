@@ -1,0 +1,65 @@
+# 🍽️ AI Unmet Demand
+
+> Ferramenta que usa **IA (Google Gemini)** e análise de dados para sugerir novos pratos a restaurantes, considerando seu cardápio atual, tipo de cozinha e ingredientes disponíveis.  
+> Inspirado em um comentário do CEO do iFood no podcast Flow sobre uma IA que identifica pratos demandados mas ausentes em determinada região.
+
+---
+
+## 📝 Contexto
+Durante um episódio do podcast **Flow**, o CEO do iFood mencionou uma IA interna capaz de sugerir pratos que os clientes desejam mas não encontram em sua região, avaliando se restaurantes locais têm o perfil e ingredientes para produzi-los.  
+Com base nessa ideia, desenvolvi este fluxo de **IA + análise de dados**, sob minha própria ótica, para replicar um processo semelhante.
+
+---
+
+## ✨ Visão Geral
+O projeto cruza dados de:
+
+- **Clientes**: itens procurados e não encontrados por setor  
+- **Restaurantes**: tipo, produtos existentes e ingredientes disponíveis  
+
+Ele utiliza modelos de linguagem (LLMs) para:
+
+1. **QueryRecipe** → Buscar ingredientes necessários para um prato informado  
+   > Em produção, seria melhor usar uma API de receitas robusta ou uma base própria (ex.: PDF estruturado).
+
+2. **CheckRestaurantAbleToAddRecipe** → Avaliar se o prato é compatível com o estilo e cardápio do restaurante.
+
+3. **CheckIngredientsToRecipeAndRestaurant** → Verificar se o restaurante já possui os ingredientes ou precisa adquiri-los.  
+   > Para produção, recomenda-se um *fine-tune* para melhorar a compreensão de variações (ex.: “sal grosso” vs. “sal fino”).
+
+O resultado final é um arquivo **`final_result.csv`** com:
+- Restaurante
+- Localização
+- Potenciais clientes
+- Observações sobre ingredientes
+
+---
+
+## 📂 Estrutura do Projeto
+.
+├── ai_core.py # Classes com prompts e integração ao Gemini
+├── core.py # Orquestra a análise e gera o resultado final
+├── create_db.py # Gera base fictícia de clientes e restaurantes
+├── clients.csv # Base de clientes (gerada)
+├── restaurants.csv # Base de restaurantes (gerada)
+└── final_result.csv # Saída do pipeline
+
+✅ Pontos de Melhoria (para produção)
+
+° Utilizar um banco de dados estruturado em vez de CSVs.
+
+° Criar um fine-tune da IA que analisa ingredientes para melhorar a precisão.
+
+° Desenvolver uma interface web ou API para integrar o fluxo em outros sistemas.  
+
+° Enviar um relatório de frequência, mostrando quando e quantos clientes buscaram cada prato sugerido, para dar mais embasamento ao restaurante.
+
+° Definir uma periodicidade de execução da aplicação (por exemplo, a cada X dias, e não diariamente), garantindo que os dados reflitam um padrão real e não apenas **pontos fora da curva**.
+
+📌 Observação
+
+Em um ambiente de produção, os dados deverão ser tratados de maneira diferente, provavelmente utilizando **chunks** para processar grandes volumes e outras medidas de otimização e tratamento, que não foram necessárias neste exemplo por se tratar de uma base criada especificamente para estudo.
+
+➕ Adicionais
+
+Poderia utilizar de uma análise parecida e replicar para casos de a loja ou prato da loja é procurado, mas ela esta offline, o que pode indicar um novo horário de trabalho para a loja.

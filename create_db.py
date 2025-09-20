@@ -1,4 +1,5 @@
 import random
+import pandas as pd
 
 class CreateDb():
 
@@ -189,8 +190,6 @@ class CreateDb():
             client['item_found'] = client['location'] in self.product_per_location[client['searched_item']]
 
 db = CreateDb()
-
-import pandas as pd
 
 df_clients = pd.DataFrame(CreateDb().clients)
 df_restaurants = pd.DataFrame(CreateDb().restaurants)
